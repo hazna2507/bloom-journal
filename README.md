@@ -6,9 +6,8 @@ Bloom Journal is a responsive journaling and mood-tracking website designed to h
 
 ## 🌿 Live Demo
 
-**Live Website:** `https://YOUR-USERNAME.github.io/bloom-journal/`
+**Live Website:** `https://hazna2507.github.io/bloom-journal/`
 
-*Replace `YOUR-USERNAME` with your GitHub username after deploying the project.*
 
 ## ✨ Features
 
