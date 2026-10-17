@@ -1,0 +1,2328 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f5ec">
+  <meta name="description" content="Bloom Journal — a gentle space for journaling, moods, habits, and little moments of growth.">
+  <title>Bloom Journal — A Little Space to Grow</title>
+
+  <style>
+    /* =========================
+       1. THEME & DESIGN TOKENS
+    ========================== */
+    :root {
+      --bg: #f7f5ec;
+      --surface: #fffdf7;
+      --surface-2: #f0f1e6;
+      --sage: #788c72;
+      --sage-dark: #526b50;
+      --sage-soft: #e2e9da;
+      --pink: #d99aab;
+      --pink-soft: #f8e7ec;
+      --peach: #f3d9c6;
+      --cream: #fffaf0;
+      --text: #354638;
+      --muted: #849083;
+      --border: #e6e7dc;
+      --shadow: 0 12px 35px rgba(75, 94, 70, 0.07);
+      --danger: #bd6464;
+      --radius: 22px;
+      --sidebar-width: 238px;
+    }
+
+    body.dark {
+      --bg: #202820;
+      --surface: #2a342b;
+      --surface-2: #354136;
+      --sage: #a6bd9c;
+      --sage-dark: #c6d9ba;
+      --sage-soft: #3c4b3b;
+      --pink: #e4a6b7;
+      --pink-soft: #49343e;
+      --peach: #54443a;
+      --cream: #333b30;
+      --text: #edf0e5;
+      --muted: #b1bcac;
+      --border: #414d40;
+      --shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+      --danger: #f19a9a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 25px;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+      outline: 3px solid var(--pink);
+      outline-offset: 3px;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .app {
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--sidebar-width);
+      padding: 27px 19px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 20;
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 8px;
+      margin-bottom: 39px;
+    }
+
+    .brand-flower {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      background: var(--pink-soft);
+      border-radius: 16px;
+      font-size: 24px;
+    }
+
+    .brand-name {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.7px;
+    }
+
+    .brand-caption {
+      display: block;
+      margin-top: -3px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-label {
+      padding: 0 12px;
+      margin-bottom: 11px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.6px;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 13px;
+      border-radius: 13px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-link:hover {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    .nav-link.active {
+      background: var(--sage-soft);
+      color: var(--sage-dark);
+    }
+
+    .nav-icon {
+      width: 23px;
+      text-align: center;
+      font-size: 17px;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding-top: 28px;
+    }
+
+    .sidebar-note {
+      padding: 18px 15px;
+      background: var(--pink-soft);
+      border-radius: 18px;
+      color: var(--text);
+    }
+
+    .sidebar-note .note-flower {
+      font-size: 23px;
+    }
+
+    .sidebar-note p {
+      margin: 7px 0 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .sidebar-note small {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .sidebar-footer {
+      padding: 18px 5px 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .main {
+      margin-left: var(--sidebar-width);
+      padding: 30px clamp(20px, 3.4vw, 48px) 50px;
+      max-width: 1800px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 5px;
+      color: var(--sage-dark);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.7px;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p {
+      overflow-wrap: anywhere;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    h1, h2, .serif {
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+      font-size: clamp(27px, 3vw, 37px);
+      font-weight: 500;
+      letter-spacing: -1.1px;
+      line-height: 1.2;
+    }
+
+    h2 {
+      margin-bottom: 5px;
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.4px;
+    }
+
+    h3 {
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+
+    .subheading {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .date-pill, .icon-button {
+      min-height: 43px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .date-pill {
+      padding: 0 13px;
+      font-size: 12px;
+    }
+
+    .icon-button {
+      width: 43px;
+      font-size: 18px;
+    }
+
+    .icon-button:hover {
+      background: var(--surface-2);
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 160px;
+      align-items: center;
+      gap: 20px;
+      padding: clamp(22px, 3vw, 35px);
+      margin-bottom: 23px;
+      border: 1px solid #e6e9dc;
+      border-radius: 25px;
+      background:
+        radial-gradient(circle at 88% 10%, rgba(255,255,255,.8), transparent 32%),
+        linear-gradient(120deg, #e8eddf, #f9e9e9 72%, #f5e8d9);
+      color: #405443;
+      overflow: hidden;
+    }
+
+    body.dark .hero {
+      border-color: var(--border);
+      background: linear-gradient(120deg, #394a39, #4b3944 72%, #4b4336);
+      color: #f3f2e9;
+    }
+
+    .hero h2 {
+      max-width: 520px;
+      margin-bottom: 10px;
+      font-size: clamp(25px, 3vw, 34px);
+      line-height: 1.25;
+    }
+
+    .hero p {
+      max-width: 560px;
+      margin: 0;
+      color: inherit;
+      opacity: 0.8;
+      font-size: 13px;
+    }
+
+    .hero-art {
+      display: grid;
+      place-items: center;
+      font-size: clamp(70px, 9vw, 105px);
+      filter: drop-shadow(0 7px 5px rgba(90, 80, 65, 0.08));
+      animation: float 5s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-7px) rotate(3deg); }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 15px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      min-width: 0;
+      padding: 19px;
+      border: 1px solid var(--border);
+      border-radius: 19px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 13px;
+    }
+
+    .stat-icon {
+      width: 37px;
+      height: 37px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--sage-soft);
+      font-size: 18px;
+    }
+
+    .stat-card:nth-child(2) .stat-icon {
+      background: var(--pink-soft);
+    }
+
+    .stat-card:nth-child(3) .stat-icon {
+      background: #f6e7d5;
+    }
+
+    .stat-card:nth-child(4) .stat-icon {
+      background: #e6e4f5;
+    }
+
+    body.dark .stat-card:nth-child(3) .stat-icon,
+    body.dark .stat-card:nth-child(4) .stat-icon {
+      background: var(--surface-2);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-number {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 29px;
+      line-height: 1.2;
+    }
+
+    .stat-caption {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.13fr) minmax(0, 0.87fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .column {
+      display: grid;
+      gap: 22px;
+      min-width: 0;
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 23px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      scroll-margin-top: 24px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .panel-header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .text-button {
+      padding: 6px 0;
+      border: 0;
+      background: transparent;
+      color: var(--sage-dark);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .text-button:hover {
+      text-decoration: underline;
+    }
+
+    body.dark .text-button {
+      color: var(--sage);
+    }
+
+    .primary-button, .secondary-button, .danger-button {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid transparent;
+      border-radius: 13px;
+      font-weight: 700;
+      font-size: 12px;
+      transition: transform .15s, background .15s;
+    }
+
+    .primary-button {
+      background: var(--sage-dark);
+      color: white;
+    }
+
+    body.dark .primary-button {
+      background: var(--sage);
+      color: #243024;
+    }
+
+    .primary-button:hover, .secondary-button:hover, .danger-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .secondary-button {
+      border-color: var(--border);
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .danger-button {
+      border-color: #f0d6d6;
+      background: #fff3f3;
+      color: #a34f4f;
+    }
+
+    body.dark .danger-button {
+      background: #4c3030;
+      border-color: #654242;
+      color: #ffd3d3;
+    }
+
+    .calendar-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .calendar-controls h3 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 17px;
+    }
+
+    .calendar-arrows {
+      display: flex;
+      gap: 6px;
+    }
+
+    .small-icon-button {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 16px;
+    }
+
+    .weekdays, .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .weekday {
+      padding: 7px 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .calendar-day {
+      position: relative;
+      min-width: 0;
+      min-height: 43px;
+      padding: 5px 2px 9px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      background: transparent;
+      color: var(--text);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .calendar-day:hover {
+      background: var(--surface-2);
+    }
+
+    .calendar-day.outside {
+      color: var(--muted);
+      opacity: .45;
+    }
+
+    .calendar-day.today {
+      border-color: var(--sage);
+      font-weight: 800;
+    }
+
+    .calendar-day.selected {
+      background: var(--sage-soft);
+      border-color: var(--sage);
+      color: var(--sage-dark);
+      font-weight: 800;
+    }
+
+    .calendar-day .day-mood {
+      position: absolute;
+      right: 0;
+      bottom: -1px;
+      left: 0;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
+    .calendar-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 4px;
+      border-radius: 50%;
+      background: var(--pink);
+    }
+
+    .legend-dot.green {
+      background: var(--sage);
+    }
+
+    .mood-options {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .mood-option {
+      min-width: 0;
+      padding: 12px 3px 10px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: var(--surface);
+      color: var(--text);
+      text-align: center;
+      transition: transform .15s, background .15s;
+    }
+
+    .mood-option:hover {
+      transform: translateY(-2px);
+    }
+
+    .mood-option.selected {
+      background: var(--pink-soft);
+      border-color: var(--pink);
+    }
+
+    .mood-emoji {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 25px;
+    }
+
+    .mood-name {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .mood-help {
+      margin: 13px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .habit-progress {
+      height: 7px;
+      margin: 12px 0 19px;
+      overflow: hidden;
+      border-radius: 100px;
+      background: var(--surface-2);
+    }
+
+    .habit-progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--sage), var(--pink));
+      transition: width .3s;
+    }
+
+    .habit-progress-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .habit-list, .entry-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .habit-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .habit-check {
+      width: 21px;
+      height: 21px;
+      flex: 0 0 21px;
+      accent-color: var(--sage-dark);
+      cursor: pointer;
+    }
+
+    .habit-emoji {
+      font-size: 20px;
+    }
+
+    .habit-name {
+      min-width: 0;
+      flex: 1;
+      overflow-wrap: anywhere;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .habit-row.completed .habit-name {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .habit-delete {
+      width: 29px;
+      height: 29px;
+      flex: 0 0 29px;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .habit-delete:hover {
+      background: var(--pink-soft);
+      color: var(--danger);
+    }
+
+    .add-habit-form {
+      display: flex;
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .add-habit-form input {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .field {
+      width: 100%;
+      min-width: 0;
+      padding: 11px 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .field::placeholder {
+      color: var(--muted);
+      opacity: .85;
+    }
+
+    .field:focus {
+      border-color: var(--sage);
+      outline: 2px solid var(--sage-soft);
+    }
+
+    .journal-form {
+      display: grid;
+      gap: 15px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 13px;
+    }
+
+    textarea.field {
+      min-height: 160px;
+      resize: vertical;
+      line-height: 1.8;
+    }
+
+    .journal-form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .form-status {
+      min-height: 20px;
+      margin: 0;
+      color: var(--sage-dark);
+      font-size: 12px;
+    }
+
+    body.dark .form-status {
+      color: var(--sage);
+    }
+
+    .entry-card {
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--bg);
+    }
+
+    .entry-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .entry-card h3 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    .entry-date {
+      margin: 4px 0 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .entry-preview {
+      margin: 0;
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .entry-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .mini-button {
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 11px;
+    }
+
+    .mini-button:hover {
+      background: var(--surface-2);
+    }
+
+    .entry-mood {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 10px;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: var(--pink-soft);
+      font-size: 10px;
+    }
+
+    .empty-state {
+      padding: 27px 15px;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .empty-state .empty-emoji {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 32px;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .empty-state p {
+      margin: 0;
+      font-size: 12px;
+    }
+
+    .quote-card {
+      position: relative;
+      padding: 23px;
+      border-radius: 20px;
+      background: var(--sage-soft);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .quote-card::after {
+      position: absolute;
+      right: 12px;
+      bottom: -30px;
+      content: "❀";
+      color: var(--sage);
+      opacity: .18;
+      font-size: 100px;
+      pointer-events: none;
+    }
+
+    .quote-label {
+      margin: 0 0 8px;
+      color: var(--sage-dark);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+
+    body.dark .quote-label {
+      color: var(--sage);
+    }
+
+    .quote-text {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      line-height: 1.55;
+    }
+
+    .quote-footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .footer {
+      padding: 28px 0 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 100;
+      max-width: min(360px, calc(100vw - 32px));
+      padding: 13px 17px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity .2s, transform .2s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* =========================
+       2. TABLET RESPONSIVENESS
+    ========================== */
+    @media (max-width: 1150px) {
+      :root {
+        --sidebar-width: 205px;
+      }
+
+      .main {
+        padding: 25px 23px 40px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .dashboard-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .dashboard-grid > .column {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+      }
+    }
+
+    /* =========================
+       3. MOBILE RESPONSIVENESS
+    ========================== */
+    @media (max-width: 700px) {
+      :root {
+        --sidebar-width: 0px;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        width: 100%;
+        height: auto;
+        padding: 12px 14px 10px;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+        overflow: visible;
+      }
+
+      .brand {
+        margin-bottom: 12px;
+        padding: 0 2px;
+      }
+
+      .brand-flower {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        font-size: 20px;
+      }
+
+      .brand-name {
+        font-size: 20px;
+      }
+
+      .brand-caption {
+        font-size: 10px;
+      }
+
+      .nav-label, .sidebar-bottom {
+        display: none;
+      }
+
+      .nav-list {
+        display: flex;
+        gap: 7px;
+        padding-bottom: 2px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+
+      .nav-link {
+        flex: 0 0 auto;
+        gap: 6px;
+        padding: 9px 11px;
+        border: 1px solid transparent;
+        font-size: 11px;
+        white-space: nowrap;
+      }
+
+      .nav-link.active {
+        border-color: var(--border);
+      }
+
+      .nav-icon {
+        width: auto;
+        font-size: 15px;
+      }
+
+      .main {
+        margin-left: 0;
+        padding: 22px 15px 35px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        margin-bottom: 20px;
+      }
+
+      .topbar h1 {
+        font-size: 27px;
+      }
+
+      .topbar .subheading {
+        max-width: 230px;
+        font-size: 12px;
+      }
+
+      .topbar-actions {
+        gap: 6px;
+      }
+
+      .date-pill {
+        display: none;
+      }
+
+      .icon-button {
+        width: 39px;
+        min-height: 39px;
+      }
+
+      .hero {
+        grid-template-columns: minmax(0, 1fr) 72px;
+        gap: 8px;
+        padding: 21px 17px;
+        border-radius: 20px;
+      }
+
+      .hero h2 {
+        font-size: 24px;
+      }
+
+      .hero p {
+        font-size: 12px;
+      }
+
+      .hero-art {
+        font-size: 61px;
+      }
+
+      .stats-grid {
+        gap: 10px;
+        margin-bottom: 22px;
+      }
+
+      .stat-card {
+        padding: 14px;
+        border-radius: 16px;
+      }
+
+      .stat-top {
+        margin-bottom: 9px;
+      }
+
+      .stat-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+      }
+
+      .stat-number {
+        font-size: 25px;
+      }
+
+      .stat-caption {
+        font-size: 10px;
+      }
+
+      .dashboard-grid {
+        gap: 17px;
+      }
+
+      .dashboard-grid > .column {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 17px;
+      }
+
+      .panel {
+        padding: 18px 15px;
+        border-radius: 19px;
+      }
+
+      .panel-header {
+        margin-bottom: 17px;
+      }
+
+      .panel-header h2 {
+        font-size: 20px;
+      }
+
+      .mood-options {
+        gap: 5px;
+      }
+
+      .mood-option {
+        padding: 10px 1px 9px;
+        border-radius: 12px;
+      }
+
+      .mood-emoji {
+        font-size: 22px;
+      }
+
+      .mood-name {
+        font-size: 9px;
+      }
+
+      .calendar-day {
+        min-height: 40px;
+      }
+
+      .form-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      textarea.field {
+        min-height: 145px;
+      }
+
+      .entry-card-top {
+        flex-direction: column;
+      }
+
+      .entry-actions {
+        align-self: flex-start;
+      }
+
+      .toast {
+        right: 12px;
+        bottom: 12px;
+      }
+    }
+
+    @media (max-width: 370px) {
+      .main {
+        padding-right: 10px;
+        padding-left: 10px;
+      }
+
+      .stats-grid {
+        gap: 7px;
+      }
+
+      .stat-card {
+        padding: 11px;
+      }
+
+      .hero {
+        grid-template-columns: minmax(0, 1fr) 48px;
+      }
+
+      .hero-art {
+        font-size: 43px;
+      }
+
+      .calendar-grid, .weekdays {
+        gap: 2px;
+      }
+
+      .calendar-day {
+        min-height: 36px;
+        font-size: 10px;
+      }
+
+      .mood-emoji {
+        font-size: 19px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <!-- SIDEBAR / MOBILE NAVIGATION -->
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#dashboard" aria-label="Bloom Journal home">
+        <span class="brand-flower" aria-hidden="true">🌷</span>
+        <span>
+          <span class="brand-name">bloom journal</span>
+          <span class="brand-caption">a little space to grow</span>
+        </span>
+      </a>
+
+      <p class="nav-label">Your little garden</p>
+      <nav class="nav-list">
+        <a class="nav-link active" href="#dashboard">
+          <span class="nav-icon" aria-hidden="true">⌂</span> Overview
+        </a>
+        <a class="nav-link" href="#journal">
+          <span class="nav-icon" aria-hidden="true">✎</span> My Journal
+        </a>
+        <a class="nav-link" href="#calendar">
+          <span class="nav-icon" aria-hidden="true">▦</span> Mood Calendar
+        </a>
+        <a class="nav-link" href="#mood">
+          <span class="nav-icon" aria-hidden="true">♡</span> Mood Tracker
+        </a>
+        <a class="nav-link" href="#habits">
+          <span class="nav-icon" aria-hidden="true">❀</span> Daily Habits
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-note">
+          <span class="note-flower" aria-hidden="true">🌼</span>
+          <p>You don't have to bloom every day. Just keep growing.</p>
+          <small>A gentle reminder for you</small>
+        </div>
+        <div class="sidebar-footer">Made with love & little flowers ♡</div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main" id="dashboard">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="greeting">A fresh little start</p>
+          <h1>Hello, lovely soul <span aria-hidden="true">🌿</span></h1>
+          <p class="subheading">A gentle place to notice your growth.</p>
+        </div>
+        <div class="topbar-actions">
+          <div class="date-pill" aria-label="Today's date">
+            <span aria-hidden="true">☀</span>
+            <span id="topDate"></span>
+          </div>
+          <button class="icon-button" id="themeToggle" type="button"
+            aria-label="Switch to dark theme" title="Toggle light and dark theme">
+            <span id="themeIcon" aria-hidden="true">☾</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- WELCOME BANNER -->
+      <section class="hero" aria-labelledby="heroTitle">
+        <div>
+          <p class="eyebrow">YOUR DAILY DOSE OF CALM</p>
+          <h2 id="heroTitle">Little by little, day by day.</h2>
+          <p id="dailyQuote">You are allowed to grow at your own pace. Every little step counts.</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">🌷</div>
+      </section>
+
+      <!-- SUMMARY CARDS -->
+      <section class="stats-grid" aria-label="Your journal summary">
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Journal entries</span>
+            <span class="stat-icon" aria-hidden="true">📖</span>
+          </div>
+          <strong class="stat-number" id="statEntries">0</strong>
+          <div class="stat-caption">Little moments you've saved</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Today's mood</span>
+            <span class="stat-icon" aria-hidden="true">💗</span>
+          </div>
+          <strong class="stat-number" id="statMood">—</strong>
+          <div class="stat-caption" id="statMoodCaption">Check in with yourself</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Habits completed</span>
+            <span class="stat-icon" aria-hidden="true">🌱</span>
+          </div>
+          <strong class="stat-number" id="statHabits">0/0</strong>
+          <div class="stat-caption">For your selected day</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Days journaled</span>
+            <span class="stat-icon" aria-hidden="true">🗓️</span>
+          </div>
+          <strong class="stat-number" id="statDays">0</strong>
+          <div class="stat-caption">Unique dates with entries</div>
+        </article>
+      </section>
+
+      <!-- DASHBOARD COLUMNS -->
+      <div class="dashboard-grid">
+        <div class="column">
+          <!-- CALENDAR -->
+          <section class="panel" id="calendar" aria-labelledby="calendarTitle">
+            <div class="panel-header">
+              <div>
+                <h2 id="calendarTitle">Your mood garden</h2>
+                <p>Every day is a new little story.</p>
+              </div>
+              <span aria-hidden="true" style="font-size:24px">🌼</span>
+            </div>
+
+            <div class="calendar-controls">
+              <h3 id="calendarMonth" aria-live="polite"></h3>
+              <div class="calendar-arrows">
+                <button class="small-icon-button" id="prevMonth" type="button"
+                  aria-label="Previous month">‹</button>
+                <button class="small-icon-button" id="nextMonth" type="button"
+                  aria-label="Next month">›</button>
+              </div>
+            </div>
+
+            <div class="weekdays" aria-hidden="true">
+              <span class="weekday">SUN</span>
+              <span class="weekday">MON</span>
+              <span class="weekday">TUE</span>
+              <span class="weekday">WED</span>
+              <span class="weekday">THU</span>
+              <span class="weekday">FRI</span>
+              <span class="weekday">SAT</span>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid" role="group"
+              aria-label="Choose a date"></div>
+
+            <div class="calendar-legend">
+              <span><i class="legend-dot"></i> Today</span>
+              <span><i class="legend-dot green"></i> Selected day</span>
+              <span>Emoji = saved mood</span>
+            </div>
+            <p class="mood-help" id="selectedDateLabel" aria-live="polite"></p>
+          </section>
+
+          <!-- JOURNAL EDITOR -->
+          <section class="panel" id="journal" aria-labelledby="journalTitle">
+            <div class="panel-header">
+              <div>
+                <h2 id="journalTitle">Dear diary...</h2>
+                <p>Let your thoughts find a soft place to land.</p>
+              </div>
+              <span aria-hidden="true" style="font-size:24px">✍️</span>
+            </div>
+
+            <form class="journal-form" id="journalForm">
+              <input type="hidden" id="entryId">
+
+              <div class="form-row">
+                <div>
+                  <label class="field-label" for="entryDate">Entry date</label>
+                  <input class="field" type="date" id="entryDate" required>
+                </div>
+                <div>
+                  <label class="field-label" for="entryTitle">A little title</label>
+                  <input class="field" id="entryTitle" type="text" maxlength="100"
+                    placeholder="e.g. A peaceful morning" required>
+                </div>
+              </div>
+
+              <div>
+                <label class="field-label" for="entryContent">Your thoughts</label>
+                <textarea class="field" id="entryContent" maxlength="10000"
+                  placeholder="What made you smile today? What is on your mind? Write freely, there is no right or wrong..." required></textarea>
+              </div>
+
+              <div class="journal-form-actions">
+                <button class="primary-button" type="submit" id="saveEntryButton">
+                  <span aria-hidden="true">♡</span> Save entry
+                </button>
+                <button class="secondary-button" type="button" id="cancelEditButton" hidden>
+                  Cancel edit
+                </button>
+                <button class="secondary-button" type="button" id="clearEntryButton">
+                  Clear form
+                </button>
+              </div>
+              <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <!-- SAVED ENTRIES -->
+          <section class="panel" aria-labelledby="entriesTitle">
+            <div class="panel-header">
+              <div>
+                <h2 id="entriesTitle">Little memories</h2>
+                <p>Your thoughts, kept in one cozy place.</p>
+              </div>
+              <span id="entryCountLabel" class="subheading">0 entries</span>
+            </div>
+            <div class="entry-list" id="entryList"></div>
+          </section>
+        </div>
+
+        <div class="column">
+          <!-- MOOD TRACKER -->
+          <section class="panel" id="mood" aria-labelledby="moodTitle">
+            <div class="panel-header">
+              <div>
+                <h2 id="moodTitle">How is your heart?</h2>
+                <p id="moodDateLabel">Choose the mood that feels closest today.</p>
+              </div>
+              <span aria-hidden="true" style="font-size:24px">💗</span>
+            </div>
+
+            <div class="mood-options" id="moodOptions" role="group"
+              aria-label="Choose your mood">
+              <button class="mood-option" type="button" data-mood="happy"
+                aria-pressed="false" aria-label="Happy">
+                <span class="mood-emoji" aria-hidden="true">😊</span>
+                <span class="mood-name">Happy</span>
+              </button>
+              <button class="mood-option" type="button" data-mood="calm"
+                aria-pressed="false" aria-label="Calm">
+                <span class="mood-emoji" aria-hidden="true">😌</span>
+                <span class="mood-name">Calm</span>
+              </button>
+              <button class="mood-option" type="button" data-mood="okay"
+                aria-pressed="false" aria-label="Okay">
+                <span class="mood-emoji" aria-hidden="true">🙂</span>
+                <span class="mood-name">Okay</span>
+              </button>
+              <button class="mood-option" type="button" data-mood="sad"
+                aria-pressed="false" aria-label="Sad">
+                <span class="mood-emoji" aria-hidden="true">🥺</span>
+                <span class="mood-name">Sad</span>
+              </button>
+              <button class="mood-option" type="button" data-mood="tired"
+                aria-pressed="false" aria-label="Tired">
+                <span class="mood-emoji" aria-hidden="true">😴</span>
+                <span class="mood-name">Tired</span>
+              </button>
+            </div>
+
+            <p class="mood-help" id="moodFeedback" role="status" aria-live="polite">
+              All feelings are welcome here. ♡
+            </p>
+          </section>
+
+          <!-- HABIT TRACKER -->
+          <section class="panel" id="habits" aria-labelledby="habitsTitle">
+            <div class="panel-header">
+              <div>
+                <h2 id="habitsTitle">Tiny daily habits</h2>
+                <p>Small steps become beautiful things.</p>
+              </div>
+              <span aria-hidden="true" style="font-size:24px">🌱</span>
+            </div>
+
+            <div class="habit-progress-label">
+              <span id="habitProgressText">Your daily progress</span>
+              <strong id="habitProgressPercent">0%</strong>
+            </div>
+            <div class="habit-progress" id="habitProgressBar"
+              role="progressbar" aria-label="Daily habit completion"
+              aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="habit-progress-fill" id="habitProgressFill"></div>
+            </div>
+
+            <div class="habit-list" id="habitList"></div>
+
+            <form class="add-habit-form" id="addHabitForm">
+              <label class="sr-only" for="newHabitName">New habit name</label>
+              <input class="field" id="newHabitName" type="text"
+                maxlength="60" placeholder="Add a little habit..." required>
+              <button class="primary-button" type="submit" aria-label="Add habit">+</button>
+            </form>
+            <p class="mood-help">Tip: tap a habit name to rename it.</p>
+          </section>
+
+          <!-- DAILY INSPIRATION -->
+          <section class="quote-card" aria-labelledby="quoteHeading">
+            <p class="quote-label" id="quoteHeading">A note for your soul ✨</p>
+            <p class="quote-text" id="quoteCardText">
+              You are allowed to grow at your own pace.
+            </p>
+            <p class="quote-footer">A little reminder, just for you.</p>
+          </section>
+        </div>
+      </div>
+
+      <footer class="footer">
+        Made with ♡, a little patience, and lots of flowers.
+        <br>Bloom gently. You're doing better than you think. 🌷
+      </footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    "use strict";
+
+    /* ==========================================
+       1. HELPERS & SAFE LOCAL STORAGE
+    =========================================== */
+    const STORAGE_KEY = "bloomJournalData_v1";
+    const THEME_KEY = "bloomJournalTheme_v1";
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+    const todayKey = () => {
+      const now = new Date();
+      return [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, "0"),
+        String(now.getDate()).padStart(2, "0")
+      ].join("-");
+    };
+
+    function dateFromKey(key) {
+      const [year, month, day] = key.split("-").map(Number);
+      return new Date(year, month - 1, day, 12);
+    }
+
+    function formatDate(key, options = {
+      month: "short", day: "numeric", year: "numeric"
+    }) {
+      return dateFromKey(key).toLocaleDateString(undefined, options);
+    }
+
+    function safeLoad() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+
+        if (!parsed || typeof parsed !== "object") return null;
+
+        return {
+          entries: Array.isArray(parsed.entries) ? parsed.entries : [],
+          moods: parsed.moods && typeof parsed.moods === "object" ? parsed.moods : {},
+          habits: Array.isArray(parsed.habits) ? parsed.habits : []
+        };
+      } catch (error) {
+        console.warn("Bloom Journal could not read saved data:", error);
+        return null;
+      }
+    }
+
+    function safeSave() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        return true;
+      } catch (error) {
+        console.warn("Bloom Journal could not save data:", error);
+        showToast("Your browser couldn't save this change. Check storage settings.");
+        return false;
+      }
+    }
+
+    const defaultHabits = [
+      { id: "habit-water", name: "Drink enough water", emoji: "💧", completed: [] },
+      { id: "habit-reading", name: "Read a few pages", emoji: "📚", completed: [] },
+      { id: "habit-journal", name: "Write in my journal", emoji: "✍️", completed: [] },
+      { id: "habit-stretch", name: "Stretch and breathe", emoji: "🌿", completed: [] }
+    ];
+
+    const loaded = safeLoad();
+    const data = loaded || {
+      entries: [],
+      moods: {},
+      habits: defaultHabits
+    };
+
+    // Keep the stored structure predictable if an older version is present.
+    data.entries = data.entries.filter(entry =>
+      entry && typeof entry.id === "string" &&
+      typeof entry.date === "string" &&
+      typeof entry.title === "string" &&
+      typeof entry.content === "string"
+    );
+
+    data.habits = data.habits
+      .filter(habit => habit && typeof habit.id === "string")
+      .map(habit => ({
+        id: habit.id,
+        name: typeof habit.name === "string" ? habit.name : "My habit",
+        emoji: typeof habit.emoji === "string" ? habit.emoji : "🌱",
+        completed: Array.isArray(habit.completed) ? habit.completed : []
+      }));
+
+    const validMoods = ["happy", "calm", "okay", "sad", "tired"];
+    Object.keys(data.moods).forEach(key => {
+      if (!validMoods.includes(data.moods[key])) delete data.moods[key];
+    });
+
+    let selectedDate = todayKey();
+    const initialDate = dateFromKey(selectedDate);
+    let calendarYear = initialDate.getFullYear();
+    let calendarMonth = initialDate.getMonth();
+    let toastTimer = null;
+
+    function showToast(message) {
+      const toast = $("#toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function createId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+      }
+      return "id-" + Date.now() + "-" + Math.random().toString(36).slice(2);
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    /* ==========================================
+       2. DAILY INSPIRATION & GREETING
+    =========================================== */
+    const quotes = [
+      "You are allowed to grow at your own pace.",
+      "Little by little, a little becomes a lot.",
+      "Even the smallest seed knows how to become a flower.",
+      "You do not have to do it all today.",
+      "Give yourself the same kindness you give to others.",
+      "Rest is part of the growing process.",
+      "Your quiet progress is still progress.",
+      "There is beauty in beginning again.",
+      "Some days, simply showing up is enough.",
+      "Make room for the things that make your heart feel at home.",
+      "You are a work in progress, and that is a lovely thing.",
+      "Let today be gentle with you."
+    ];
+
+    function renderDailyMessage() {
+      const dayNumber = Math.floor(dateFromKey(todayKey()).getTime() / 86400000);
+      const quote = quotes[((dayNumber % quotes.length) + quotes.length) % quotes.length];
+      $("#dailyQuote").textContent = quote;
+      $("#quoteCardText").textContent = quote;
+
+      const hour = new Date().getHours();
+      let greeting = "A fresh little start";
+      if (hour < 12) greeting = "A lovely good morning";
+      else if (hour < 17) greeting = "A gentle good afternoon";
+      else greeting = "A peaceful good evening";
+
+      $("#greeting").textContent = greeting;
+      $("#topDate").textContent = new Date().toLocaleDateString(undefined, {
+        month: "short", day: "numeric"
+      });
+    }
+
+    /* ==========================================
+       3. THEME
+    =========================================== */
+    function applyTheme(theme) {
+      const dark = theme === "dark";
+      document.body.classList.toggle("dark", dark);
+      $("#themeIcon").textContent = dark ? "☀" : "☾";
+      $("#themeToggle").setAttribute(
+        "aria-label",
+        dark ? "Switch to light theme" : "Switch to dark theme"
+      );
+      $("#themeToggle").title = dark ? "Switch to light theme" : "Switch to dark theme";
+
+      try {
+        localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+      } catch (error) {
+        // The theme still works for this page even if storage is unavailable.
+      }
+    }
+
+    function initializeTheme() {
+      let savedTheme = "light";
+      try {
+        savedTheme = localStorage.getItem(THEME_KEY) || "light";
+      } catch (error) {
+        savedTheme = "light";
+      }
+      applyTheme(savedTheme);
+    }
+
+    $("#themeToggle").addEventListener("click", () => {
+      applyTheme(document.body.classList.contains("dark") ? "light" : "dark");
+    });
+
+    /* ==========================================
+       4. JOURNAL CREATE / READ / UPDATE / DELETE
+    =========================================== */
+    const journalForm = $("#journalForm");
+
+    function resetJournalForm(date = selectedDate) {
+      journalForm.reset();
+      $("#entryId").value = "";
+      $("#entryDate").value = date;
+      $("#saveEntryButton").innerHTML = '<span aria-hidden="true">♡</span> Save entry';
+      $("#cancelEditButton").hidden = true;
+      $("#formStatus").textContent = "";
+    }
+
+    function startEditingEntry(id) {
+      const entry = data.entries.find(item => item.id === id);
+      if (!entry) {
+        showToast("That entry could not be found.");
+        return;
+      }
+
+      $("#entryId").value = entry.id;
+      $("#entryDate").value = entry.date;
+      $("#entryTitle").value = entry.title;
+      $("#entryContent").value = entry.content;
+      $("#saveEntryButton").innerHTML = "♡ Update entry";
+      $("#cancelEditButton").hidden = false;
+      $("#formStatus").textContent = "You're editing a saved memory.";
+
+      $("#journal").scrollIntoView({ behavior: "smooth", block: "start" });
+      $("#entryTitle").focus({ preventScroll: true });
+    }
+
+    function deleteEntry(id) {
+      const entry = data.entries.find(item => item.id === id);
+      if (!entry) return;
+
+      const confirmed = window.confirm(
+        "Would you like to permanently delete this journal entry?"
+      );
+      if (!confirmed) return;
+
+      data.entries = data.entries.filter(item => item.id !== id);
+      safeSave();
+
+      if ($("#entryId").value === id) resetJournalForm(selectedDate);
+      renderAll();
+      showToast("Entry deleted. 🌿");
+    }
+
+    journalForm.addEventListener("submit", event => {
+      event.preventDefault();
+
+      const id = $("#entryId").value;
+      const date = $("#entryDate").value;
+      const title = $("#entryTitle").value.trim();
+      const content = $("#entryContent").value.trim();
+
+      if (!date || !title || !content) {
+        $("#formStatus").textContent = "Please fill in the date, title, and your thoughts.";
+        return;
+      }
+
+      const existing = data.entries.find(entry => entry.id === id);
+
+      if (existing) {
+        existing.date = date;
+        existing.title = title;
+        existing.content = content;
+      } else {
+        data.entries.push({
+          id: createId(),
+          date,
+          title,
+          content,
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      safeSave();
+      selectedDate = date;
+      calendarYear = dateFromKey(date).getFullYear();
+      calendarMonth = dateFromKey(date).getMonth();
+      resetJournalForm(selectedDate);
+      renderAll();
+      showToast(existing ? "Your memory has been updated. 🌷" : "Your memory has been saved. 🌷");
+    });
+
+    $("#cancelEditButton").addEventListener("click", () => {
+      resetJournalForm(selectedDate);
+    });
+
+    $("#clearEntryButton").addEventListener("click", () => {
+      resetJournalForm(selectedDate);
+      showToast("The journal form is ready for a fresh start.");
+    });
+
+    function renderEntries() {
+      const list = $("#entryList");
+      const entries = [...data.entries].sort((a, b) => {
+        return b.date.localeCompare(a.date) ||
+          String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+      });
+
+      $("#entryCountLabel").textContent =
+        entries.length + (entries.length === 1 ? " entry" : " entries");
+
+      if (entries.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <span class="empty-emoji" aria-hidden="true">📔</span>
+            <strong>Your story starts here</strong>
+            <p>Your first journal entry is waiting to be written.</p>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = entries.map(entry => {
+        const mood = moodInfo(data.moods[entry.date]);
+        const preview = entry.content.length > 210
+          ? entry.content.slice(0, 210) + "…"
+          : entry.content;
+
+        return `
+          <article class="entry-card">
+            <div class="entry-card-top">
+              <div>
+                <h3>${escapeHTML(entry.title)}</h3>
+                <p class="entry-date">${escapeHTML(formatDate(entry.date))}</p>
+              </div>
+              <div class="entry-actions">
+                <button class="mini-button" type="button"
+                  data-edit-entry="${escapeHTML(entry.id)}">Edit</button>
+                <button class="mini-button" type="button"
+                  data-delete-entry="${escapeHTML(entry.id)}"
+                  aria-label="Delete ${escapeHTML(entry.title)}">Delete</button>
+              </div>
+            </div>
+            <p class="entry-preview">${escapeHTML(preview)}</p>
+            ${mood ? `<span class="entry-mood">${mood.emoji} ${mood.label}</span>` : ""}
+          </article>`;
+      }).join("");
+    }
+
+    $("#entryList").addEventListener("click", event => {
+      const editButton = event.target.closest("[data-edit-entry]");
+      const deleteButton = event.target.closest("[data-delete-entry]");
+
+      if (editButton) startEditingEntry(editButton.dataset.editEntry);
+      if (deleteButton) deleteEntry(deleteButton.dataset.deleteEntry);
+    });
+
+    /* ==========================================
+       5. MOOD TRACKER
+    =========================================== */
+    const moods = {
+      happy: { emoji: "😊", label: "Happy", message: "Let yourself enjoy the little good things." },
+      calm: { emoji: "😌", label: "Calm", message: "May you carry this peaceful feeling gently." },
+      okay: { emoji: "🙂", label: "Okay", message: "An ordinary day is still a day worth living." },
+      sad: { emoji: "🥺", label: "Sad", message: "You don't have to feel happy to deserve kindness." },
+      tired: { emoji: "😴", label: "Tired", message: "Rest is productive, too. Take it one step at a time." }
+    };
+
+    function moodInfo(key) {
+      return moods[key] || null;
+    }
+
+    function renderMoodOptions() {
+      $$(".mood-option").forEach(button => {
+        const selected = data.moods[selectedDate] === button.dataset.mood;
+        button.classList.toggle("selected", selected);
+        button.setAttribute("aria-pressed", String(selected));
+      });
+
+      const currentMood = moodInfo(data.moods[selectedDate]);
+      $("#moodFeedback").textContent = currentMood
+        ? currentMood.emoji + " " + currentMood.message
+        : "All feelings are welcome here. ♡";
+
+      $("#moodDateLabel").textContent =
+        "How are you feeling on " + formatDate(selectedDate, {
+          month: "short", day: "numeric"
+        }) + "?";
+    }
+
+    $("#moodOptions").addEventListener("click", event => {
+      const button = event.target.closest("[data-mood]");
+      if (!button) return;
+
+      const mood = button.dataset.mood;
+      if (!moods[mood]) return;
+
+      if (data.moods[selectedDate] === mood) {
+        delete data.moods[selectedDate];
+        showToast("Mood check-in cleared.");
+      } else {
+        data.moods[selectedDate] = mood;
+        showToast("Mood saved. Thank you for checking in. ♡");
+      }
+
+      safeSave();
+      renderAll();
+    });
+
+    /* ==========================================
+       6. MOOD CALENDAR
+    =========================================== */
+    function renderCalendar() {
+      const grid = $("#calendarGrid");
+      const firstDay = new Date(calendarYear, calendarMonth, 1);
+      const startOffset = firstDay.getDay();
+      const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+      const previousMonthDays = new Date(calendarYear, calendarMonth, 0).getDate();
+
+      $("#calendarMonth").textContent = firstDay.toLocaleDateString(undefined, {
+        month: "long", year: "numeric"
+      });
+
+      const cells = [];
+
+      for (let i = 0; i < 42; i++) {
+        let day;
+        let date;
+        let outside = false;
+
+        if (i < startOffset) {
+          day = previousMonthDays - startOffset + i + 1;
+          date = new Date(calendarYear, calendarMonth - 1, day);
+          outside = true;
+        } else if (i >= startOffset + daysInMonth) {
+          day = i - startOffset - daysInMonth + 1;
+          date = new Date(calendarYear, calendarMonth + 1, day);
+          outside = true;
+        } else {
+          day = i - startOffset + 1;
+          date = new Date(calendarYear, calendarMonth, day);
+        }
+
+        const key = [
+          date.getFullYear(),
+          String(date.getMonth() + 1).padStart(2, "0"),
+          String(date.getDate()).padStart(2, "0")
+        ].join("-");
+
+        const mood = moodInfo(data.moods[key]);
+        const isToday = key === todayKey();
+        const isSelected = key === selectedDate;
+
+        cells.push(`
+          <button type="button"
+            class="calendar-day${outside ? " outside" : ""}${isToday ? " today" : ""}${isSelected ? " selected" : ""}"
+            data-date="${key}"
+            aria-label="${escapeHTML(formatDate(key, {
+              weekday: "long", month: "long", day: "numeric", year: "numeric"
+            }))}${mood ? ", mood: " + mood.label : ""}${isSelected ? ", selected" : ""}"
+            aria-pressed="${isSelected}">
+            ${day}
+            ${mood ? `<span class="day-mood" aria-hidden="true">${mood.emoji}</span>` : ""}
+          </button>`);
+      }
+
+      grid.innerHTML = cells.join("");
+      $("#selectedDateLabel").textContent =
+        "Selected: " + formatDate(selectedDate, {
+          weekday: "short", month: "long", day: "numeric", year: "numeric"
+        });
+    }
+
+    function selectDate(key) {
+      selectedDate = key;
+      const date = dateFromKey(key);
+      calendarYear = date.getFullYear();
+      calendarMonth = date.getMonth();
+
+      if (!$("#entryId").value) {
+        $("#entryDate").value = selectedDate;
+      }
+
+      renderAll();
+    }
+
+    $("#calendarGrid").addEventListener("click", event => {
+      const button = event.target.closest("[data-date]");
+      if (button) selectDate(button.dataset.date);
+    });
+
+    $("#prevMonth").addEventListener("click", () => {
+      calendarMonth--;
+      if (calendarMonth < 0) {
+        calendarMonth = 11;
+        calendarYear--;
+      }
+      renderCalendar();
+    });
+
+    $("#nextMonth").addEventListener("click", () => {
+      calendarMonth++;
+      if (calendarMonth > 11) {
+        calendarMonth = 0;
+        calendarYear++;
+      }
+      renderCalendar();
+    });
+
+    /* ==========================================
+       7. HABIT TRACKER
+    =========================================== */
+    const habitEmojis = ["🌱", "💧", "📚", "🧘", "✍️", "🚶", "🍎", "🌙", "🤍", "🎨"];
+
+    function renderHabits() {
+      const list = $("#habitList");
+
+      if (data.habits.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <span class="empty-emoji" aria-hidden="true">🌱</span>
+            <strong>A new habit can start small</strong>
+            <p>Add one gentle routine you'd like to practice.</p>
+          </div>`;
+      } else {
+        list.innerHTML = data.habits.map(habit => {
+          const completed = habit.completed.includes(selectedDate);
+
+          return `
+            <div class="habit-row${completed ? " completed" : ""}">
+              <input class="habit-check" type="checkbox"
+                data-habit-check="${escapeHTML(habit.id)}"
+                id="check-${escapeHTML(habit.id)}"
+                ${completed ? "checked" : ""}
+                aria-label="Mark ${escapeHTML(habit.name)} complete">
+              <span class="habit-emoji" aria-hidden="true">${escapeHTML(habit.emoji)}</span>
+              <button type="button" class="text-button habit-name"
+                data-rename-habit="${escapeHTML(habit.id)}"
+                title="Tap to rename this habit"
+                style="text-align:left;overflow-wrap:anywhere">
+                ${escapeHTML(habit.name)}
+              </button>
+              <button type="button" class="habit-delete"
+                data-delete-habit="${escapeHTML(habit.id)}"
+                aria-label="Delete habit ${escapeHTML(habit.name)}"
+                title="Delete habit">×</button>
+            </div>`;
+        }).join("");
+      }
+
+      const completedCount = data.habits.filter(habit =>
+        habit.completed.includes(selectedDate)
+      ).length;
+
+      const percent = data.habits.length
+        ? Math.round(completedCount / data.habits.length * 100)
+        : 0;
+
+      $("#habitProgressText").textContent =
+        completedCount + " of " + data.habits.length + " completed";
+      $("#habitProgressPercent").textContent = percent + "%";
+      $("#habitProgressFill").style.width = percent + "%";
+      $("#habitProgressBar").setAttribute("aria-valuenow", String(percent));
+    }
+
+    $("#habitList").addEventListener("change", event => {
+      const checkbox = event.target.closest("[data-habit-check]");
+      if (!checkbox) return;
+
+      const habit = data.habits.find(item => item.id === checkbox.dataset.habitCheck);
+      if (!habit) return;
+
+      if (checkbox.checked) {
+        if (!habit.completed.includes(selectedDate)) {
+          habit.completed.push(selectedDate);
+        }
+      } else {
+        habit.completed = habit.completed.filter(date => date !== selectedDate);
+      }
+
+      safeSave();
+      renderAll();
+    });
+
+    $("#habitList").addEventListener("click", event => {
+      const renameButton = event.target.closest("[data-rename-habit]");
+      const deleteButton = event.target.closest("[data-delete-habit]");
+
+      if (renameButton) {
+        const habit = data.habits.find(item => item.id === renameButton.dataset.renameHabit);
+        if (!habit) return;
+
+        const newName = window.prompt("Give this habit a new name:", habit.name);
+        if (newName === null) return;
+
+        const trimmed = newName.trim();
+        if (!trimmed) {
+          showToast("A habit needs a name.");
+          return;
+        }
+
+        habit.name = trimmed.slice(0, 60);
+        safeSave();
+        renderAll();
+        showToast("Habit renamed. 🌱");
+      }
+
+      if (deleteButton) {
+        const habit = data.habits.find(item => item.id === deleteButton.dataset.deleteHabit);
+        if (!habit) return;
+
+        if (!window.confirm('Delete the habit "' + habit.name + '" and its completion history?')) {
+          return;
+        }
+
+        data.habits = data.habits.filter(item => item.id !== habit.id);
+        safeSave();
+        renderAll();
+        showToast("Habit removed.");
+      }
+    });
+
+    $("#addHabitForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const input = $("#newHabitName");
+      const name = input.value.trim();
+      if (!name) return;
+
+      data.habits.push({
+        id: createId(),
+        name: name.slice(0, 60),
+        emoji: habitEmojis[data.habits.length % habitEmojis.length],
+        completed: []
+      });
+
+      safeSave();
+      input.value = "";
+      renderAll();
+      showToast("A little new habit has taken root. 🌱");
+    });
+
+    /* ==========================================
+       8. SUMMARY STATS & FULL RENDER
+    =========================================== */
+    function renderStats() {
+      const todaysMood = moodInfo(data.moods[todayKey()]);
+      const completed = data.habits.filter(habit =>
+        habit.completed.includes(selectedDate)
+      ).length;
+
+      const uniqueDates = new Set(data.entries.map(entry => entry.date));
+
+      $("#statEntries").textContent = data.entries.length;
+      $("#statMood").textContent = todaysMood ? todaysMood.emoji : "—";
+      $("#statMoodCaption").textContent = todaysMood
+        ? todaysMood.label + " today"
+        : "Check in with yourself";
+      $("#statHabits").textContent = completed + "/" + data.habits.length;
+      $("#statDays").textContent = uniqueDates.size;
+    }
+
+    function renderAll() {
+      renderCalendar();
+      renderMoodOptions();
+      renderHabits();
+      renderEntries();
+      renderStats();
+    }
+
+    /* ==========================================
+       9. NAVIGATION HIGHLIGHT
+    =========================================== */
+    $$(".nav-link").forEach(link => {
+      link.addEventListener("click", () => {
+        $$(".nav-link").forEach(item => item.classList.remove("active"));
+        link.classList.add("active");
+      });
+    });
+
+    /* ==========================================
+       10. START THE APP
+    =========================================== */
+    initializeTheme();
+    renderDailyMessage();
+    resetJournalForm(selectedDate);
+    renderAll();
+  </script>
+</body>
+</html>
